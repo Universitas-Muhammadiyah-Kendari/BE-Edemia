@@ -1,0 +1,70 @@
+# name: Edemia CI
+
+# on:
+#   push:
+#     branches:
+#       - main
+#     tags-ignore:
+#       - v*
+#   pull_request:
+#     types: [assigned, synchronize, reopened]
+
+# jobs:
+#   test_backend:
+#     runs-on: ubuntu-latest
+#     name: Testing backend
+#     services:
+#       mongo:
+#         image: mongo
+#         ports:
+#           - 27017:27017
+#       rabbitmq:
+#         image: rabbitmq
+#         ports:
+#           - 5672:5672
+          
+#     steps:
+#       - name: Git checkout
+#         uses: actions/checkout@v2
+#       - name: setup golang
+#         uses: actions/setup-go@v2
+#         with:
+#           go-version: "1.16"
+#       - name: Testing
+#         working-directory: ./server
+#         run: |
+#           cp -f config/.env.ci config/test.env
+#           cp -f config/.env.ci config/app.env
+#           mkdir coverage
+#           go test -v -coverpkg=./... -coverprofile=coverage/coverage.out ./... && go tool cover -func coverage/coverage.out
+#       - name: Archive code coverage results
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: coverage-backend
+#           path: ./server/coverage
+#           retention-days: 1
+#   sonarqube:
+#     runs-on: ubuntu-latest
+#     name: Sonarcloud scan
+#     needs:
+#         [
+#           test_backend,
+#           test_frontend,
+#         ]
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: download backend code coverage
+#         uses: actions/download-artifact@v2
+#         with:
+#           name: coverage-backend
+#           path: ./server/coverage
+#       - name: download frontend code coverage
+#         uses: actions/download-artifact@v2
+#         with:
+#           name: coverage-frontend
+#           path: ./backoffice-dashboard/coverage
+#       - name: SonarCloud Scan
+#         uses: sonarsource/sonarcloud-github-action@master
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

@@ -1,0 +1,5 @@
+FROM quay.io/keycloak/keycloak:20.0.1
+
+RUN find / -perm +6000 -type f -exec chmod a-s {} \; || true
+
+COPY ./standalone-ha.xml /opt/jboss/keycloak/standalone/configuration/standalone-ha.xml

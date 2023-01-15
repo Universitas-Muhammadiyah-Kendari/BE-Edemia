@@ -1,0 +1,54 @@
+version: "3.1"
+
+volumes:
+  postgres_db_data:
+    driver: local
+
+services:
+  postgres_db:
+    build:
+      context: ./db
+      dockerfile: db.Dockerfile
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: edemia
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_db_data:/var/lib/postgresql/data
+  keycloak:
+    build:
+      context: ./keycloak-config
+      dockerfile: Dockerfile
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: postgres_db
+      DB_PORT: 5432
+      DB_DATABASE: edemia
+      DB_USER: user
+      DB_SCHEMA: keycloak_schema
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: Pa55w0rd
+    volumes:
+      - ./keycloak-config/dashboard:/opt/jboss/keycloak/themes/dashboard
+    command: 
+      - start-dev
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres_db
+  server:
+    build:
+      context: ./server
+      dockerfile: docker/dev.Dockerfile
+    working_dir: /Edemia
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server:/Edemia
+    environment:
+      APP_ENV: DEVELOPMENT
+    depends_on:
+      - postgres_db

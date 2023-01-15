@@ -16,7 +16,7 @@
 ## About The Project
 ___
 
-Learning Management System is a platform used for online and structured learning. Edemia is a Learning Management System platform that we created from scratch, this product we developed for companies that want to have an LMS platform for their employees.
+Learning Management System is a platform used for online and structured learning. Edemia is a Learning Management System platform that we created from scratch, this product we developed for companies, colleges, even schools. Who want to have their platform.
 
 In this project, we implement Clean Architecture with Hexagonal patterns. So, it can be expanded easily and quickly by people who want to contribute.
 
